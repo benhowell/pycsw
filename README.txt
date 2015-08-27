@@ -12,7 +12,8 @@ pycsw is Open Source, released under an MIT license, and runs on all major platf
 Please read the docs at http://pycsw.org/docs for more information.
 
 
-This forked version was modified for use with SPC Geoscience Division and includes the following:
+This forked version was modified for use by SPC Geoscience Division and acts as csw cataloge service for GeoNode. 
+Changes to this fork includes the following:
  * Bug fix: pycsw-admin export_records now reads schema (mappings) from config file passed in as a command parameter rather than the default config.
  * Bug fix: pycsw-admin export_records now uses schema mapping to determine xml column (previously hardcoded as record.xml)
  * New functionality to export records to a single csv file.
