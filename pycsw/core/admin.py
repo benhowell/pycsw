@@ -35,6 +35,8 @@
 import logging
 import os
 import sys
+import collections
+from datetime import datetime
 from glob import glob
 
 from pycsw.core import metadata, repository, util
@@ -416,8 +418,57 @@ def import_model_from_file(mappings):
 
 def export_record_table_csv(context, database, table, mappings, xml_dirpath):
     """Export record table from database to csv file"""
-    pass
+    import csv
+    
+    repo = repository.Repository(database, context, table=table)
 
+    LOGGER.info('Querying database %s, table %s ....', database, table)
+    records = repo.session.query(repo.dataset)
+
+    LOGGER.info('Found %d records\n', records.count())
+
+    LOGGER.info('Exporting records\n')
+
+    dirpath = os.path.abspath(xml_dirpath)
+
+    if not os.path.exists(dirpath):
+        LOGGER.info('Directory %s does not exist.  Creating...', dirpath)
+        try:
+            os.makedirs(dirpath)
+        except OSError as err:
+            raise RuntimeError('Could not create %s %s' % (dirpath, err))
+
+    is_headers_written = False
+    filename = os.path.join(dirpath, '%s.csv' % str(datetime.now()))
+    with open(filename, 'wb') as csvfile:
+      csvwriter = csv.writer(csvfile, delimiter=',',
+			  quotechar='"', quoting=csv.QUOTE_MINIMAL)
+      
+      for record in records.all():
+	if mappings is None:
+	  model = context.md_core_model
+	else:
+	  model = import_model_from_file(mappings)
+
+	headers = []
+	row = []
+	map_dict = model['mappings']
+	for k,v in map_dict.iteritems():
+	  field_value = \
+	    getattr(record,
+	      model['mappings'][k], "")
+	  
+	  if is_headers_written is False:
+	    headers.append(model['mappings'][k])
+	  
+	  row.append(field_value)
+	
+	if is_headers_written is False:
+	  csvwriter.writerow(headers)
+	  
+	csvwriter.writerow(row)
+	is_headers_written = True
+      
 
 
 
