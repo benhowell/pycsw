@@ -401,7 +401,6 @@ def export_records(context, database, table, mappings, xml_dirpath):
 	  LOGGER.info('Writing to file %s', filename)
 	  with open(filename, 'w') as xml:
 	      xml.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-	      #xml.write(record.xml)
 	      xml.write(xml_field)
       except Exception as err:
 	  raise RuntimeError("Error writing to %s" % filename, err)
@@ -411,7 +410,6 @@ def import_model_from_file(mappings):
   import imp
   module = imp.load_source(mappings, mappings)
   return module.MD_CORE_MODEL
-
 
 
 def export_record_table_csv(context, database, table, mappings, xml_dirpath):
