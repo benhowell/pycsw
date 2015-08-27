@@ -57,6 +57,7 @@ SYNOPSIS
               - setup_db
               - load_records
               - export_records
+              - export_record_table_csv
               - rebuild_db_indexes
               - optimize_db
               - refresh_harvested_records
@@ -145,6 +146,9 @@ EXAMPLES
    12.) delete_records: Deletes all records from repository without prompting
 
         pycsw-admin.py -c delete_records -f default.cfg -y
+        
+   13.) export_record_table_csv: Dump metadata table from repository into directory
+	pycsw-admin.py -c export_record_table_csv -p /path/to/records -f default.cfg
 
 '''
 
@@ -158,6 +162,7 @@ XML = None
 XSD = None
 TIMEOUT = 30
 FORCE_CONFIRM = False
+
 
 if len(sys.argv) == 1:
     print usage()
@@ -200,6 +205,7 @@ if COMMAND is None:
     sys.exit(4)
 
 if COMMAND not in ['setup_db', 'load_records', 'export_records',
+		   'export_record_table_csv',
                    'rebuild_db_indexes', 'optimize_db',
                    'refresh_harvested_records', 'gen_sitemap',
                    'post_xml', 'get_sysprof',
@@ -211,7 +217,7 @@ if CFG is None and COMMAND not in ['post_xml', 'get_sysprof', 'validate_xml']:
     print 'ERROR: -f <cfg> is a required argument'
     sys.exit(6)
 
-if COMMAND in ['load_records', 'export_records'] and XML_DIRPATH is None:
+if COMMAND in ['load_records', 'export_records', 'export_record_table_csv'] and XML_DIRPATH is None:
     print 'ERROR: -p </path/to/records> is a required argument'
     sys.exit(7)
 
@@ -231,6 +237,10 @@ if COMMAND not in ['post_xml', 'get_sysprof', 'validate_xml']:
         TABLE = SCP.get('repository', 'table')
     except ConfigParser.NoOptionError:
         TABLE = 'records'
+    try:
+	MAPPINGS = SCP.get('repository', 'mappings')
+    except ConfigParser.NoOptionError:
+        MAPPINGS = None
 
 elif COMMAND not in ['get_sysprof', 'validate_xml']:
     if CSW_URL is None:
@@ -257,7 +267,9 @@ if COMMAND == 'setup_db':
 elif COMMAND == 'load_records':
     admin.load_records(CONTEXT, DATABASE, TABLE, XML_DIRPATH, RECURSIVE, FORCE_CONFIRM)
 elif COMMAND == 'export_records':
-    admin.export_records(CONTEXT, DATABASE, TABLE, XML_DIRPATH)
+    admin.export_records(CONTEXT, DATABASE, TABLE, MAPPINGS, XML_DIRPATH)
+elif COMMAND == 'export_record_table_csv':
+    admin.export_record_table_csv(CONTEXT, DATABASE, TABLE, MAPPINGS, XML_DIRPATH)
 elif COMMAND == 'rebuild_db_indexes':
     admin.rebuild_db_indexes(DATABASE, TABLE)
 elif COMMAND == 'optimize_db':

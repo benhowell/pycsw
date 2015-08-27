@@ -354,7 +354,7 @@ def load_records(context, database, table, xml_dirpath, recursive=False, force_u
                     LOGGER.warn('ERROR: not inserted %s', err)
 
 
-def export_records(context, database, table, xml_dirpath):
+def export_records(context, database, table, mappings, xml_dirpath):
     """Export metadata records from database to directory of files"""
     repo = repository.Repository(database, context, table=table)
 
@@ -375,25 +375,48 @@ def export_records(context, database, table, xml_dirpath):
             raise RuntimeError('Could not create %s %s' % (dirpath, err))
 
     for record in records.all():
-        identifier = \
-            getattr(record,
-                    context.md_core_model['mappings']['pycsw:Identifier'])
+      if mappings is None:
+	model = context.md_core_model
+      else:
+	model = import_model_from_file(mappings)
+      
+      identifier = \
+	getattr(record,
+	  model['mappings']['pycsw:Identifier'])
+      xml_field = \
+	getattr(record,
+	  model['mappings']['pycsw:XML'])
+      
+      LOGGER.info('Processing %s', identifier)
+      if identifier.find(':') != -1:  # it's a URN
+	# sanitize identifier
+	LOGGER.info(' Sanitizing identifier')
+	identifier = identifier.split(':')[-1]
 
-        LOGGER.info('Processing %s', identifier)
-        if identifier.find(':') != -1:  # it's a URN
-            # sanitize identifier
-            LOGGER.info(' Sanitizing identifier')
-            identifier = identifier.split(':')[-1]
+      # write to XML document
+      filename = os.path.join(dirpath, '%s.xml' % identifier)
+      try:
+	  LOGGER.info('Writing to file %s', filename)
+	  with open(filename, 'w') as xml:
+	      xml.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+	      #xml.write(record.xml)
+	      xml.write(xml_field)
+      except Exception as err:
+	  raise RuntimeError("Error writing to %s" % filename, err)
 
-        # write to XML document
-        filename = os.path.join(dirpath, '%s.xml' % identifier)
-        try:
-            LOGGER.info('Writing to file %s', filename)
-            with open(filename, 'w') as xml:
-                xml.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-                xml.write(record.xml)
-        except Exception as err:
-            raise RuntimeError("Error writing to %s" % filename, err)
+
+def import_model_from_file(mappings):
+  import imp
+  module = imp.load_source(mappings, mappings)
+  return module.MD_CORE_MODEL
+
+
+
+def export_record_table_csv(context, database, table, mappings, xml_dirpath):
+    """Export record table from database to csv file"""
+    pass
+
+
 
 
 def refresh_harvested_records(context, database, table, url):
@@ -573,3 +596,7 @@ def delete_records(context, database, table):
     
     repo = repository.Repository(database, context, table=table)
     repo.delete(constraint={'where': '', 'values': []})
+
+
+
+
