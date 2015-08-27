@@ -13,5 +13,6 @@ Please read the docs at http://pycsw.org/docs for more information.
 
 
 This forked version was modified for use with SPC Geoscience Division and includes the following:
- * Bug fix: pycsw-admin export_records now reads schema (mappings) from config file passed in as a command parameter.
+ * Bug fix: pycsw-admin export_records now reads schema (mappings) from config file passed in as a command parameter rather than the default config.
+ * Bug fix: pycsw-admin export_records now uses schema mapping to determine xml column (previously hardcoded as record.xml)
  * New functionality to export records to a single csv file.
