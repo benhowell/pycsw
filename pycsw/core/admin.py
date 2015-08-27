@@ -3,9 +3,11 @@
 #
 # Authors: Tom Kralidis <tomkralidis@gmail.com>
 #          Angelos Tzotsos <tzotsos@gmail.com>
+#          Ben Howell <ben@benhowell.net>
 #
 # Copyright (c) 2015 Tom Kralidis
 # Copyright (c) 2015 Angelos Tzotsos
+# Copyright (c) 2015 Ben Howell
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
