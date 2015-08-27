@@ -35,8 +35,6 @@
 import logging
 import os
 import sys
-import collections
-from datetime import datetime
 from glob import glob
 
 from pycsw.core import metadata, repository, util
@@ -419,6 +417,7 @@ def import_model_from_file(mappings):
 def export_record_table_csv(context, database, table, mappings, xml_dirpath):
     """Export record table from database to csv file"""
     import csv
+    from datetime import datetime
     
     repo = repository.Repository(database, context, table=table)
 
