@@ -10,3 +10,8 @@ pycsw allows for the publishing and discovery of geospatial metadata. Existing r
 pycsw is Open Source, released under an MIT license, and runs on all major platforms (Windows, Linux, Mac OS X).
 
 Please read the docs at http://pycsw.org/docs for more information.
+
+
+This forked version was modified for use with SPC Geoscience Division and includes the following:
+ * Bug fix: pycsw-admin export_records now reads schema (mappings) from config file passed in as a command parameter.
+ * New functionality to export records to a single csv file.
